@@ -11,10 +11,10 @@
 ## Запуск локально
 ```bash
 pip install -r requirements.txt
-python -m uvicorn main:app --reload --port 8001
+python -m uvicorn main:app --reload --port 8080
 ```
 
-UI: http://127.0.0.1:8001/
+UI: http://127.0.0.1:8080/
 API: /api/search?q=iphone&limit=20&page=1
 Docs: /docs
 Health: /health
