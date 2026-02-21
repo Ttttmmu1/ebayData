@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Результати: {{ meta.q }}</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <script defer src="/static/js/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <div class="top">
+        <h2>Результати: “{{ meta.q }}”</h2>
+        <div class="muted">
+          Знайдено: {{ meta.total }}. Сторінка {{ meta.page }}/{{ meta.total_pages }}
+          (limit={{ meta.limit }}, offset={{ meta.offset }})
+        </div>
+      </div>
+      <div class="sub">
+        Env: <span class="pill">{{ meta.env }}</span>
+        <span class="sep">|</span>
+        Marketplace: <span class="pill">{{ meta.marketplace }}</span>
+      </div>
+
+      <nav class="pager">
+        {% set base = "/ui/search?q=" ~ meta.q ~ "&limit=" ~ meta.limit ~ "&sort=" ~ meta.sort %}
+        <a class="pager-btn" href="{{ base ~ "&page=" ~ meta.prev_page }}">← Prev</a>
+        <a class="pager-btn" href="{{ base ~ "&page=" ~ meta.next_page }}">Next →</a>
+        <a class="pager-btn" href="/">На головну</a>
+      </nav>
+    </header>
+
+    <section class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Фото</th>
+            <th>Товар</th>
+            <th>Ціна</th>
+            <th>Стан</th>
+            <th>Доставка</th>
+            <th>Seller</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if items|length == 0 %}
+            <tr><td colspan="6">Нічого не знайдено.</td></tr>
+          {% endif %}
+
+          {% for p in items %}
+            <tr>
+              <td>
+                {% if p.image_url %}
+                  <img class="img" src="{{ p.image_url }}" alt="thumb" />
+                {% else %}
+                  <div class="img ph"></div>
+                {% endif %}
+              </td>
+              <td>
+                <div class="title">
+                  {% if p.web_url %}
+                    <a href="{{ p.web_url }}" target="_blank" rel="noreferrer"><strong>{{ p.title }}</strong></a>
+                  {% else %}
+                    <strong>{{ p.title }}</strong>
+                  {% endif %}
+                </div>
+                <div class="muted">
+                  {{ p.category or "" }}
+                  {% if p.location_country %}• {{ p.location_country }}{% endif %}
+                </div>
+              </td>
+              <td>{{ p.price_value }} {{ p.price_currency }}</td>
+              <td>{{ p.condition or "" }}</td>
+              <td>
+                {% if p.shipping_value is not none %}
+                  {{ p.shipping_value }} {{ p.shipping_currency }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>{{ p.seller_feedback or "" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>
