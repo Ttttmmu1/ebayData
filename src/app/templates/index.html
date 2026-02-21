@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>eBay Live Search</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="/static/js/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <h1>Пошук товарів (Live eBay Browse API)</h1>
+      <div class="sub">
+        Env: <span class="pill">{{ env }}</span>
+        <span class="sep">|</span>
+        Marketplace: <span class="pill">{{ marketplace }}</span>
+        <span class="sep">|</span>
+        JSON API: <span class="pill">/api/search</span>
+        <span class="sep">|</span>
+        Health: <span class="pill">/health</span>
+      </div>
+    </header>
+
+    <section class="card">
+      <form class="form" id="searchForm">
+        <div class="grid">
+          <div class="field">
+            <label for="q">Запит</label>
+            <input id="q" name="q" placeholder="Напр. iphone" value="{{ defaults.q }}" required />
+          </div>
+
+          <div class="field">
+            <label for="limit">На сторінку</label>
+            <input id="limit" name="limit" type="number" min="1" max="200" value="{{ defaults.limit }}" />
+          </div>
+
+          <div class="field">
+            <label for="page">Сторінка</label>
+            <input id="page" name="page" type="number" min="1" value="{{ defaults.page }}" />
+          </div>
+
+          <div class="field">
+            <label for="sort">Сортування (опційно)</label>
+            <select id="sort" name="sort">
+              <option value="">Без сортування</option>
+              <option value="price">Ціна ↑ (дешеві спочатку)</option>
+              <option value="-price">Ціна ↓ (дорогі спочатку)</option>
+              <option value="newlyListed">Нові надходження</option>
+              <option value="bestMatch">Найкраща відповідність</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="searchBtn">Шукати</button>
+          <button type="button" id="exportBtn" disabled>Експорт в Excel</button>
+          <a class="link" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+        </div>
+
+        <div class="hint">
+          Пагінація: <span class="pill">offset = (page-1)*limit</span>. Sandbox = тестові дані, Production = реальні.
+        </div>
+      </form>
+    </section>
+
+    <section class="card" id="resultsCard" style="margin-top:16px;">
+      <div class="top" style="margin-bottom:10px;">
+        <div>
+          <h2 style="margin:0;">Результати</h2>
+          <div class="muted" id="metaLine">Нічого не шукали ще.</div>
+          <div class="analytics" id="analyticsBox" style="display:none; margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div class="charts" id="chartsBox" style="display:none; margin-top:14px;">
+        <div class="chart-card">
+          <div class="muted">Гістограма Total (ціна + доставка)</div>
+          <canvas id="totalHistChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="muted">Top countries</div>
+          <canvas id="countriesChart" height="120"></canvas>
+        </div>
+      </div>
+
+      <div style="overflow:auto;">
+        <table class="table" id="resultsTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Товар</th>
+              <th>Категорія</th>
+              <th>Стан</th>
+              <th>Ціна</th>
+              <th>Доставка</th>
+              <th>Загальна ціна</th>
+              <th>Країна</th>
+              <th>Seller рейтинг</th>
+              <th>Item ID</th>
+              <th>Посилання на товар</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="muted" id="errorLine" style="display:none;"></div>
+    </section>
+
+  </div>
+</body>
+</html>
