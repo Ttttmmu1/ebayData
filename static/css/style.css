@@ -1,0 +1,112 @@
+:root { --bg:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb; --card:#fff; }
+*{box-sizing:border-box;}
+body{margin:0;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg);}
+.wrap{max-width:1200px;margin:0 auto;}
+.header h1,.header h2{margin:0 0 10px;}
+.header .sub{color:var(--muted);font-size:13px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.sep{color:var(--border);}
+.card{border:1px solid var(--border);border-radius:12px;background:var(--card);padding:16px;}
+.pill{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px;color:#374151;}
+.form .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+label{font-size:14px;color:#374151;}
+
+/* ✅ input і select однакові */
+input, select{
+  padding:10px 12px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  width:100%;
+  min-width:0;
+  background:#fff;
+  color:var(--text);
+}
+
+/* щоб select був “як поле”, а не сірий */
+select{
+  appearance: auto;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+}
+
+.actions{margin-top:14px;display:flex;gap:12px;align-items:center;}
+button{
+  padding:10px 14px;
+  border:1px solid var(--text);
+  border-radius:10px;
+  background:var(--text);
+  color:#fff;
+  cursor:pointer;
+}
+button:hover{opacity:.92;}
+button[disabled]{ opacity:.55; cursor:not-allowed; }
+
+.link{color:var(--text);text-decoration:none;border-bottom:1px dashed var(--border);}
+.link:hover{opacity:.85;}
+.hint{margin-top:10px;color:var(--muted);font-size:13px;}
+.muted{color:var(--muted);font-size:13px;}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;}
+.table{width:100%;border-collapse:collapse;}
+.table th,.table td{border-bottom:1px solid var(--border);padding:10px;text-align:left;vertical-align:top;}
+.table th{background:#f9fafb;font-weight:600;}
+
+.nowrap,
+code.nowrap,
+td code {
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+.btn-open {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #111827;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+.btn-open:hover { background: #2563eb; }
+
+/* Analytics cards */
+.analytics{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.analytics .a-card{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 12px;
+  min-width:180px;
+  background:#f9fafb;
+}
+.analytics .a-title{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.analytics .a-value{
+  font-size:16px;
+  font-weight:700;
+  color:var(--text);
+}
+
+/* Charts */
+.charts{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+.chart-card{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  background:#fff;
+}
+
+@media(max-width:900px){
+  .form .grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .charts{grid-template-columns: 1fr;}
+}
