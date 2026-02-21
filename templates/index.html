@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>eBay Live Search</title>
   <link rel="stylesheet" href="/static/css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="/static/js/app.js"></script>
 </head>
 <body>
@@ -43,17 +44,18 @@
           <div class="field">
             <label for="sort">Сортування (опційно)</label>
             <select id="sort" name="sort">
-                <option value="">Без сортування</option>
-                <option value="price">Ціна ↑ (дешеві спочатку)</option>
-                <option value="-price">Ціна ↓ (дорогі спочатку)</option>
-                <option value="newlyListed">Нові надходження</option>
+              <option value="">Без сортування</option>
+              <option value="price">Ціна ↑ (дешеві спочатку)</option>
+              <option value="-price">Ціна ↓ (дорогі спочатку)</option>
+              <option value="newlyListed">Нові надходження</option>
               <option value="bestMatch">Найкраща відповідність</option>
             </select>
           </div>
         </div>
 
         <div class="actions">
-          <button type="submit">Шукати</button>
+          <button type="submit" id="searchBtn">Шукати</button>
+          <button type="button" id="exportBtn" disabled>Експорт в Excel</button>
           <a class="link" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
         </div>
 
@@ -64,41 +66,48 @@
     </section>
 
     <section class="card" id="resultsCard" style="margin-top:16px;">
-  <div class="top" style="margin-bottom:10px;">
-    <div>
-      <h2 style="margin:0;">Результати</h2>
-      <div class="muted" id="metaLine">Нічого не шукали ще.</div>
-    </div>
+      <div class="top" style="margin-bottom:10px;">
+        <div>
+          <h2 style="margin:0;">Результати</h2>
+          <div class="muted" id="metaLine">Нічого не шукали ще.</div>
+          <div class="analytics" id="analyticsBox" style="display:none; margin-top:8px;"></div>
+        </div>
+      </div>
 
-    <nav class="pager" id="pager" style="display:none;">
-      <button type="button" class="pager-btn" id="prevBtn">← Prev</button>
-      <button type="button" class="pager-btn" id="nextBtn">Next →</button>
-    </nav>
-  </div>
+      <div class="charts" id="chartsBox" style="display:none; margin-top:14px;">
+        <div class="chart-card">
+          <div class="muted">Гістограма Total (ціна + доставка)</div>
+          <canvas id="totalHistChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="muted">Top countries</div>
+          <canvas id="countriesChart" height="120"></canvas>
+        </div>
+      </div>
 
-  <div style="overflow:auto;">
-    <table class="table" id="resultsTable" style="display:none;">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Товар</th>
-          <th>Категорія</th>
-          <th>Стан</th>
-          <th>Ціна</th>
-          <th>Доставка</th>
-          <th>Загальна ціна</th>
-          <th>Країна</th>
-          <th>Seller рейтинг</th>
-          <th>Item ID</th>
-          <th>Посилання на товар</th>
-        </tr>
-      </thead>
-      <tbody id="resultsBody"></tbody>
-    </table>
-  </div>
+      <div style="overflow:auto;">
+        <table class="table" id="resultsTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Товар</th>
+              <th>Категорія</th>
+              <th>Стан</th>
+              <th>Ціна</th>
+              <th>Доставка</th>
+              <th>Загальна ціна</th>
+              <th>Країна</th>
+              <th>Seller рейтинг</th>
+              <th>Item ID</th>
+              <th>Посилання на товар</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
 
-  <div class="muted" id="errorLine" style="display:none;"></div>
-</section>
+      <div class="muted" id="errorLine" style="display:none;"></div>
+    </section>
 
   </div>
 </body>
