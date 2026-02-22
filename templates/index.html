@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>eBay Live Search</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <!-- ✅ потрібен Chart.js для графіків на головній -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="/static/js/app.js"></script>
+</head>
+
+<body class="page-search">
+  <div class="wrap">
+    <header class="header">
+      <div class="header-row">
+        <h1>Пошук товарів (Live eBay Browse)</h1>
+        <a class="btn-link" href="/ui/dataset">Аналіз даних</a>
+      </div>
+
+      <div class="sub">
+        Env: <span class="pill">{{ env }}</span>
+        <span class="sep">|</span>
+        Marketplace: <span class="pill">{{ marketplace }}</span>
+        <span class="sep">|</span>
+        JSON API: <span class="pill">/api/search</span>
+        <span class="sep">|</span>
+        Health: <span class="pill">/health</span>
+      </div>
+    </header>
+
+    <section class="card">
+      <form class="form" id="searchForm">
+        <div class="grid">
+          <div class="field">
+            <label for="q">Запит</label>
+            <input id="q" name="q" placeholder="Напр. iphone" value="{{ defaults.q }}" required />
+          </div>
+
+          <div class="field">
+            <label for="limit">Елементів на сторінку</label>
+            <input id="limit" name="limit" type="number" min="1" max="200" value="{{ defaults.limit }}" />
+          </div>
+
+          <div class="field">
+            <label for="page">Сторінка</label>
+            <input id="page" name="page" type="number" min="1" value="{{ defaults.page }}" />
+          </div>
+
+          <div class="field">
+            <label for="sort">Сортування (опційно)</label>
+            <select id="sort" name="sort">
+              <option value="">Без сортування</option>
+              <option value="price">Ціна ↑ (дешеві спочатку)</option>
+              <option value="-price">Ціна ↓ (дорогі спочатку)</option>
+              <option value="newlyListed">Нові надходження</option>
+              <option value="bestMatch">Найкраща відповідність</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="searchBtn">Шукати</button>
+          <button type="button" id="exportBtn" disabled>Експорт в Excel</button>
+        </div>
+
+        <div class="hint">
+          Пагінація: <span class="pill">offset = (page-1)*limit</span>.
+        </div>
+      </form>
+    </section>
+
+    <section class="card" id="resultsCard" style="margin-top:16px;">
+      <div class="top" style="margin-bottom:10px;">
+        <div>
+          <h2 style="margin:0;">Результати</h2>
+          <div class="muted" id="metaLine">Нічого ще не шукали.</div>
+
+          <!-- метрики -->
+          <div class="analytics" id="analyticsBox" style="display:none; margin-top:8px;"></div>
+
+          <!-- ✅ графіки (показуємо після пошуку) -->
+          <div class="charts" id="mainCharts" style="display:none; margin-top:14px;">
+            <div class="chart-card">
+              <div class="muted">Гістограма: Total price (price + shipping)</div>
+              <canvas id="priceHistChart" height="130"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="muted">Top країн (кількість товарів)</div>
+              <canvas id="countryChart" height="130"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- idle animation ДО пошуку -->
+      <div id="idleAnim" class="idle-hero">
+        <div class="idle-bg">
+          <span class="blob b1"></span>
+          <span class="blob b2"></span>
+          <span class="blob b3"></span>
+        </div>
+        <div class="idle-content">
+          <div class="idle-title">Готово до пошуку</div>
+          <div class="idle-sub">Введи запит і натисни <b>“Шукати”</b> - тут зʼявляться результати, метрики та графіки.</div>
+
+          <div class="idle-shimmer">
+            <div class="idle-line w65"></div>
+            <div class="idle-line w55"></div>
+            <div class="idle-line w40"></div>
+          </div>
+
+          <div class="idle-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- skeleton під час запиту -->
+      <div id="loadingBox" class="skeleton-box" style="display:none;">
+        <div class="s-row">
+          <div class="s-line w40"></div>
+          <div class="s-line w20"></div>
+          <div class="s-line w30"></div>
+        </div>
+        <div class="s-table">
+          <div class="s-th"></div><div class="s-th"></div><div class="s-th"></div>
+          <div class="s-th"></div><div class="s-th"></div><div class="s-th"></div>
+        </div>
+        <div class="muted" style="margin-top:10px;">Завантаження даних…</div>
+      </div>
+
+      <div style="overflow:auto;">
+        <table class="table" id="resultsTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Товар</th>
+              <th>Категорія</th>
+              <th>Стан</th>
+              <th>Ціна</th>
+              <th>Доставка</th>
+              <th>Загальна ціна</th>
+              <th>Країна</th>
+              <th>Seller рейтинг</th>
+              <th>Item ID</th>
+              <th>Посилання на товар</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="muted" id="errorLine" style="display:none;"></div>
+    </section>
+  </div>
+</body>
+</html>
